@@ -1,9 +1,10 @@
+import os
 import logging
 import asyncio
+from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 
-# Bot tokeni va kanal ID si
 BOT_TOKEN = "8878421158:AAFQnkOu8qzBqTj5uGcHReDxQbHG5KZqw8k"
 CHANNEL_ID = -1003960126207 
 
@@ -37,8 +38,21 @@ async def search_anime(message: types.Message):
         parse_mode="Markdown"
     )
 
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
 async def main():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
+        
